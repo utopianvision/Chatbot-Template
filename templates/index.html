@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with Trump</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 { color: #333; }
+
+        .chat {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            text-align: left;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .user-message, .Trump-message {
+            margin: 10px 0;
+        }
+
+        .user-message { color: #2b36d4; }
+        .Trump-message { color: #df2525; }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            resize: none;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chat with Trump</h1>
+        <div class="chat" id="chat"></div>
+        <textarea id="user_input" placeholder="Type your message here..."></textarea><br>
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const userInput = document.getElementById('user_input').value.trim();
+            if (!userInput) return;
+
+            const chat = document.getElementById('chat');
+            const userMessage = document.createElement('p');
+            userMessage.classList.add('user-message');
+            userMessage.innerHTML = `<strong>You:</strong> ${userInput}`;
+            chat.appendChild(userMessage);
+
+            fetch('/send_message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: userInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const trumpMessage = document.createElement('p');
+                trumpMessage.classList.add('Trump-message');
+                trumpMessage.innerHTML = `<strong>Trump:</strong> ${data.response}`;
+                chat.appendChild(trumpMessage);
+                chat.scrollTop = chat.scrollHeight;
+            })
+            .catch(error => {
+                const errorMessage = document.createElement('p');
+                errorMessage.innerHTML = `Error: ${error.message}`;
+                chat.appendChild(errorMessage);
+            });
+
+            document.getElementById('user_input').value = '';
+        }
+
+        // Add event listener for 'Enter' key press
+        document.getElementById('user_input').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevents new line on enter key
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+[project]
+name = "Trump-chatbot"
+version = "0.1.0"
+description = "Imitates Trump's personality using AI"
+
+dependencies = [
+    "flask",
+    "google-generativeai",
+    "markdown"
+]
